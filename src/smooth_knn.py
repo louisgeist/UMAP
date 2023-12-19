@@ -18,7 +18,6 @@ def knn(X,k):
 
 	knn_dists , knn = dist.topk(dim = 1, largest = False, k = k)
 
-
 	return knn, knn_dists
 
 
