@@ -11,11 +11,15 @@ def smooth_knn_dist(knn,knn_dist,err):
     err is the stopping error
     
     knn and knn_dist are tensors of size (n,k) with k the number of neighbors
+    
+    Unlike McInnes et al :
+     - rho is computed in the function
+     - smooth_knn_dist computes the sigma directly for the whole dataset
 
 
     """
 
-    k = knn_dist.shape[1]
+    k = knn_dist.shape[1]-1
     n = knn_dist.shape[0]
     
     sigma_tens = torch.zeros(n)
