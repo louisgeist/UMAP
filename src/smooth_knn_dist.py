@@ -44,27 +44,29 @@ def smooth_knn_dist(knn,knn_dist,err):
     
     for i in range(n):
         dist_xi = knn_dist[[i]][0][1:]
-        p = dist_xi[0].item()
+        rho = dist_xi[0].item()
         d_min = dist_xi[1].item()
         d_max = dist_xi[k-2].item()
         
         if k>8:
-            b = d_max-p
+            b = d_max-rho
         else: #si k<8 on est pas assuré d'avoir une quantité positive avec d1-p
-            b = 10*(d_max-p) #en multipliant par 100 on est de nouveau sur d'avoir qqchose de >0
+            b = 10*(d_max-rho) #en multipliant par 10 on est de nouveau sur d'avoir qqchose de >0
             
-        a = (d_min-p)/math.log(k/(math.log(k)/math.log(2)))
+        a = (d_min-rho)/math.log((k-1)/((math.log(k)/math.log(2))-1))
         
         #vérif conditions initiales --> à enlever
-        test_a = torch.exp(-((dist_xi-p)/a)).sum() -math.log(k)/math.log(2)
-        test_b = torch.exp(-((dist_xi-p)/b)).sum() -math.log(k)/math.log(2)
+        test_a = torch.exp(-((dist_xi-rho)/a)).sum() -math.log(k)/math.log(2)
+        test_b = torch.exp(-((dist_xi-rho)/b)).sum() -math.log(k)/math.log(2)
         if test_a>0 or test_b<0:
             print('WARNING')
+            print('a',test_a)
+            print('b',test_b)
             
         sigma = (a+b)/2
         mem = b
         while abs(mem-sigma) > err:
-            test = torch.exp(-((dist_xi-p)/sigma)).sum() - math.log(k)/math.log(2)
+            test = torch.exp(-((dist_xi-rho)/sigma)).sum() - math.log(k)/math.log(2)
             if test<0:
                 a = sigma
             else:
@@ -76,3 +78,4 @@ def smooth_knn_dist(knn,knn_dist,err):
 
 X = torch.randn(30,8)
 res = smooth_knn_dist(knn(X, 5)[0], knn(X,5)[1],10**(-5)) 
+print(res)
