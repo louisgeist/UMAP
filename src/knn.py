@@ -14,7 +14,8 @@ def knn(X, k):
     dots = X @ X.T
     norms = (X**2).sum(axis=1)
 
-    dist = torch.sqrt(norms.view(n, 1) + norms.view(1, n) - 2 * dots)
+    dist = torch.sqrt((norms.view(n, 1) + norms.view(1, n) - 2 * dots).clamp_min(0) )
+    print("dist dans knn", dist)
 
     knn_dists, knn = dist.topk(dim=1, largest=False, k=k)
 
@@ -25,6 +26,6 @@ def knn(X, k):
     # return knn, knn_dists
 
 
-X = torch.randn(10, 6)
-print(X)
-print(knn(X, 4))
+# X = torch.randn(10, 6)
+# print(X)
+# print(knn(X, 4))
