@@ -2,29 +2,7 @@
 import torch
 import math
 
-def knn(X, k):
-    """
-    X is a tensor of size (n,d)
-    k is the number of nearest neighbors we are looking for
-
-    X
-
-    """
-    n = X.shape[0]
-
-    dots = X @ X.T
-    norms = (X**2).sum(axis=1)
-
-    dist = torch.sqrt(norms.view(n, 1) + norms.view(1, n) - 2 * dots)
-
-    knn_dists, knn = dist.topk(dim=1, largest=False, k=k)
-
-    return knn, knn_dists
-
-    # |x-y|^2 = |x|^2 - 2<x,y> + |y|^2
-
-    # return knn, knn_dists
-
+from knn import knn
 
 
 def smooth_knn_dist(knn,knn_dist,err):
@@ -76,6 +54,6 @@ def smooth_knn_dist(knn,knn_dist,err):
         sigma_tens[i] = sigma
     return sigma_tens
 
-X = torch.randn(30,8)
-res = smooth_knn_dist(knn(X, 5)[0], knn(X,5)[1],10**(-5)) 
-print(res)
+# X = torch.randn(30,8)
+# res = smooth_knn_dist(knn(X, 5)[0], knn(X,5)[1],10**(-5)) 
+# print(res)
