@@ -1,5 +1,4 @@
 import torch
-import networkx as nx
 
 from knn import knn
 from smooth_knn_dist import smooth_knn_dist
