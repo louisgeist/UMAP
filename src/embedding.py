@@ -3,6 +3,9 @@ from fuzzy_set import local_fuzzy_simplicial_set
 
 import torch.nn as nn
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 def spectral_embedding(top_rep, embedding_dimension):
 	"""
 	Spectral embedding proposed in McInnes et al. (2020).
@@ -28,7 +31,7 @@ A = local_fuzzy_simplicial_set(X,n_neighbors = 4)
 B = A + A.transpose(0,1) - A * A.transpose(0,1)
 spectral_embedding(B, embedding_dimension = 2)
 
-def optimize_embedding(top_rep, Y, min_dist, n_epeochs):
+def optimize_embedding(top_rep, Y, min_dist, n_epochs):
 
 	alpha = 1
 
@@ -42,7 +45,6 @@ def optimize_embedding(top_rep, Y, min_dist, n_epeochs):
 		else :
 			return torch.exp(-(norm2 - min_dist))
 
-
 	class phi_class(nn.Module):
 		def __init__(self):
 			super().__init__()
@@ -50,15 +52,58 @@ def optimize_embedding(top_rep, Y, min_dist, n_epeochs):
 			self.b = nn.Parameter(torch.ones(1))
 
 		def forward(self,x,y):
-			return (1 + self.a * (torch.sum((x-y)**2))**self.a)**(-1)
+			return (1 + self.a * (torch.sum((x-y)**2))**self.b)**(-1)
+
+		def train(self, n_epochs_phi = 1000):
+			"""
+			Choices made :
+			 - train on 'linspace(0,10, 1000)'
+			 (- during n_epochs)
+
+			"""
+			phi_optimizer = torch.optim.Adam(self.parameters())
+			virtual_data = torch.linspace(0,10, 1000)
+
+
+			for epoch in range(n_epochs_phi):
+
+				phi_optimizer.zero_grad()
+				loss = 0
+				
+				for i,x in enumerate(virtual_data) :
+					loss += (phi.forward(x,0) - psi(x,0))**2
+
+				loss.backward()
+				phi_optimizer.step()
+
+		def display(self):
+
+			x_var = np.linspace(0,10,1000)
+			y_psi = [psi(torch.tensor(x),0) for x in x_var]
+			y_phi = [self(torch.tensor(x),0).detach().numpy() for x in x_var]
+
+			plt.figure()
+			plt.plot(x_var, y_psi, label = "psi")
+			plt.plot(x_var, y_phi, label = "fitted phi")
+			plt.legend()
+			plt.show()
+
 
 	phi = phi_class()
+	phi.train()
+	phi.display()
+	
+
+	
+
+
+
 
 
 	
 	return(phi(torch.ones(2),2*torch.ones(2)))
 
-print(optimize_embedding(B , None, 1, 1))
+print("end : ", optimize_embedding(B , None, 1, 1000))
 
 
 
