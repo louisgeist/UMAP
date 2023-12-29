@@ -21,19 +21,14 @@ def spectral_embedding(top_rep, embedding_dimension):
 	eigenvalues , eigenvectors = torch.linalg.eig(L)
 	eigenvalues, eigenvectors = torch.abs(eigenvalues), torch.abs(eigenvectors) # L is a real symetric matrix, then the eigenvalues are real
 
-	Y = eigenvectors[torch.argsort(eigenvalues)[1:embedding_dimension+1]]
+	Y = eigenvectors[torch.argsort(eigenvalues)[1:embedding_dimension+1]].transpose(0,1)
 
 	return Y
 
 
-X = torch.randn(10, 6)
-A = local_fuzzy_simplicial_set(X,n_neighbors = 4)
-B = A + A.transpose(0,1) - A * A.transpose(0,1)
-spectral_embedding(B, embedding_dimension = 2)
-
 def optimize_embedding(top_rep, Y, min_dist, n_epochs):
 
-	alpha = 1
+	n_neg_samples = 0
 
 	# fit phi from psi (defined by min_dist)
 
@@ -71,12 +66,12 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
 				loss = 0
 				
 				for i,x in enumerate(virtual_data) :
-					loss += (phi.forward(x,0) - psi(x,0))**2
+					loss += (self.forward(x,0) - psi(x,0))**2
 
 				loss.backward()
 				phi_optimizer.step()
 
-		def display(self):
+		def display_fit(self):
 
 			x_var = np.linspace(0,10,1000)
 			y_psi = [psi(torch.tensor(x),0) for x in x_var]
@@ -90,20 +85,51 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
 
 
 	phi = phi_class()
-	phi.train()
-	phi.display()
+	phi.train(n_epochs_phi = 100)
+	phi.display_fit()
 	
+	alpha = 1
+	n = Y.shape[0]
 
-	
+	for epoch in range(1,n_epochs+1):
+		print("Epoch n° ", epoch)
+		
+		for i in range(n):
+			for j in range(n):
+				# ajout une première condition "if B[i,j] !=0" pour ne pas tirer un nbr pour rien ?
+
+				if torch.rand(1).item() < top_rep[i,j] :
+					Y_i = Y[i]
+					Y_i.requires_grad_()
+
+				
+					f = torch.log(phi(Y_i, Y[j]))
+					grad = torch.autograd.grad(f, Y_i, create_graph=True)[0]
+					Y[i] += alpha * grad
+
+			for _ in range(1,n_neg_samples+1):
+
+				c = torch.randint(n-1,(1,))
+				if c ==i : 
+					break
+
+				Y_i = Y[i]
+				Y_i.requires_grad_()
+
+				f = torch.log(1 - phi(Y_i,Y[c]))
+				grad = torch.autograd.grad(f, Y_i, create_graph=True)[0]
+				Y[i] += alpha * grad
+
+		alpha = 1 - epoch/n_epochs
+
+	return Y
 
 
 
+# X = torch.randn(1000, 20)
+# A = local_fuzzy_simplicial_set(X, 100)
+# B = A + A.transpose(0,1) - A * A.transpose(0,1)
 
-
-	
-	return(phi(torch.ones(2),2*torch.ones(2)))
-
-print("end : ", optimize_embedding(B , None, 1, 1000))
-
-
+# Y = spectral_embedding(B, embedding_dimension = 2)
+# print("end : ", optimize_embedding(B , Y, min_dist = 0.1, n_epochs = 100))
 
