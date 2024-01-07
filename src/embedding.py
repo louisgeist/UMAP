@@ -27,8 +27,15 @@ def spectral_embedding(top_rep, embedding_dimension):
 
 
 def optimize_embedding(top_rep, Y, min_dist, n_epochs):
+	"""
+	The input value of Y is the initialized embedding. 
+	Typically initialized with spectral_embedding.
 
-	n_neg_samples = 0
+
+	"""
+
+
+	n_neg_samples = 20
 
 	# fit phi from psi (defined by min_dist)
 
@@ -56,7 +63,7 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
 			 (- during n_epochs)
 
 			"""
-			phi_optimizer = torch.optim.Adam(self.parameters())
+			phi_optimizer = torch.optim.Adam(self.parameters(),lr = 0.5)
 			virtual_data = torch.linspace(0,10, 1000)
 
 
@@ -86,6 +93,8 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
 
 	phi = phi_class()
 	phi.train(n_epochs_phi = 100)
+	print(phi.a)
+	print(phi.b)
 	phi.display_fit()
 	
 	alpha = 1
@@ -96,7 +105,6 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
 		
 		for i in range(n):
 			for j in range(n):
-				# ajout une première condition "if B[i,j] !=0" pour ne pas tirer un nbr pour rien ?
 
 				if torch.rand(1).item() < top_rep[i,j] :
 					Y_i = Y[i]
@@ -105,20 +113,22 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
 				
 					f = torch.log(phi(Y_i, Y[j]))
 					grad = torch.autograd.grad(f, Y_i, create_graph=True)[0]
-					Y[i] += alpha * grad
 
-			for _ in range(1,n_neg_samples+1):
+					Y[i] += alpha * grad.clamp(-4,4)
 
-				c = torch.randint(n-1,(1,))
-				if c ==i : 
-					break
+					for _ in range(1,n_neg_samples+1):
 
-				Y_i = Y[i]
-				Y_i.requires_grad_()
+						c = torch.randint(n-1,(1,))
+						if c == i : 
+							break
 
-				f = torch.log(1 - phi(Y_i,Y[c]))
-				grad = torch.autograd.grad(f, Y_i, create_graph=True)[0]
-				Y[i] += alpha * grad
+						Y_i = Y[i]
+						Y_i.requires_grad_()
+						f = torch.log(1 - phi(Y_i,Y[c]))
+						grad = torch.autograd.grad(f, Y_i, create_graph=True)[0]
+						
+
+						Y[i] += alpha * grad.clamp(-4,4)
 
 		alpha = 1 - epoch/n_epochs
 
