@@ -28,7 +28,7 @@ n_points = 1000
 
 for i,x in enumerate(train_dataset) :
 	X.append(x[0])
-	labels.append(float(x[1]/10) )
+	labels.append(x[1])
 
 	if i > n_points :
 		break
@@ -37,12 +37,16 @@ X = torch.stack(tuple(X))
 
 
 print("Begin")
-Y, Y_initial = UMAP(X, 100, 2, 0.01, 1)
+Y, Y_initial = UMAP(X, 60, 2, 0.05, 400)
 
+fig, ax = plt.subplots()
 
-plt.figure()
-plt.scatter(Y[:,0],Y[:,1], c = labels, cmap = "Set2", label = "Data Points")
+scatter = ax.scatter(Y[:,0],Y[:,1], c = labels, cmap = "Set3", label = "Data Points")
+legend1 = ax.legend(*scatter.legend_elements(), loc="lower left", title="Classes")
+ax.add_artist(legend1)
 plt.title(f"{n_points} samples of MNIST (28x28) represented in 2D space")
+
+
 plt.axis('off')
 plt.show()
 
