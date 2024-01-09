@@ -24,22 +24,25 @@ train_dataset.transform = transforms.Compose([trans2D, flatten])
 X = []
 labels = []
 
+n_points = 1000
+
 for i,x in enumerate(train_dataset) :
 	X.append(x[0])
 	labels.append(float(x[1]/10) )
 
-	if i > 1000:
+	if i > n_points :
 		break
 
 X = torch.stack(tuple(X))
 
 
 print("Begin")
-Y, Y_initial = UMAP(X, 100, 2, 0.01, 400)
+Y, Y_initial = UMAP(X, 100, 2, 0.01, 1)
 
 
 plt.figure()
-plt.scatter(Y[:,0],Y[:,1], c = labels)
-plt.title("Reduction from 3D to 2D")
+plt.scatter(Y[:,0],Y[:,1], c = labels, cmap = "Set2", label = "Data Points")
+plt.title(f"{n_points} samples of MNIST (28x28) represented in 2D space")
+plt.axis('off')
 plt.show()
 
