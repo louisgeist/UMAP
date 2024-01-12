@@ -5,6 +5,7 @@ import torch.nn as nn
 
 import matplotlib.pyplot as plt
 import numpy as np
+from memory_profiler import profile
 
 def spectral_embedding(top_rep, embedding_dimension):
     """
@@ -18,7 +19,7 @@ def spectral_embedding(top_rep, embedding_dimension):
     D = torch.diag(A @ torch.ones(n))
     L = torch.sqrt(D) @ (D - A) @ torch.sqrt(D)
 
-    eigenvalues , eigenvectors = torch.linalg.eig(L)
+    eigenvalues, eigenvectors = torch.linalg.eig(L)
     eigenvalues, eigenvectors = torch.abs(eigenvalues), torch.abs(eigenvectors) # L is a real symetric matrix, then the eigenvalues are real
 
     Y = eigenvectors[torch.argsort(eigenvalues)[1:embedding_dimension+1]].transpose(0,1)
@@ -35,7 +36,7 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
     """
 
 
-    n_neg_samples = 20
+    n_neg_samples = 200
 
     # fit phi from psi (defined by min_dist)
 
@@ -106,27 +107,31 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
         for i in range(n):
 
             Y_i = Y[i]
+            #print("1 : ",Y.requires_grad)
             Y_i.requires_grad_()
+            #print("2 ; ", Y.requires_grad)
             Y_without_i = torch.cat((Y[:i],Y[i+1:]), dim= 0)
 
             tensor_bool = torch.rand(n-1,)< torch.cat((top_rep[i,:i],top_rep[i,i+1:]), dim = -1)
             f = torch.log(phi(Y_without_i, Y_i)) * tensor_bool
 
-            grad = torch.autograd.grad(f.sum(), Y_i, create_graph=True)[0]
+            grad = torch.autograd.grad(f.sum(), Y_i)[0]
 
 
             Y[i] += alpha * grad.clamp(-4,4)
 
             # negative sampling
             arange_without_i = torch.cat((torch.arange(0,i),torch.arange(i+1,n)))
-            rand_index = torch.randperm(n-1)[n_neg_samples]
+            rand_index = torch.randperm(n-1)[:n_neg_samples]
             c = arange_without_i[rand_index]
 
             f = torch.log(1- phi(Y[c],Y_i))
 
-            grad = torch.autograd.grad(f.sum(), Y_i, create_graph = True)[0]
+            grad_neg = torch.autograd.grad(f.sum(), Y_i)[0]
 
-            Y[i] += alpha * grad.clamp(-4,4)
+            Y[i] += alpha * grad_neg.clamp(-4,4)
+            #print(Y.requires_grad)
+
 
         alpha = 1 - epoch/n_epochs
 
