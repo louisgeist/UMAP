@@ -15,7 +15,7 @@ n_neighbors = 100
 embedding_dimension = 2
 min_dist = 0.05
 
-n_points = 15000
+n_points = 1000
 
 trans2D = transforms.Compose([
         transforms.ToTensor(),
@@ -26,7 +26,6 @@ flatten = transforms.Lambda(lambda x: x.view(-1))
 
 train_dataset = datasets.MNIST(root='../data', train = True, transform=trans2D, download=True)
 train_dataset.transform = transforms.Compose([trans2D, flatten])
-# dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
 
 
 X = []
