@@ -22,8 +22,8 @@ for file_name in os.listdir(directory):
 
 	fig, ax = plt.subplots()
 
-	scatter = ax.scatter(Y[:,0],Y[:,1], c = labels, cmap = "Set3", label = "Data Points", s=15)
-	legend1 = ax.legend(*scatter.legend_elements(), loc="lower left", title="Classes")
+	scatter = ax.scatter(Y[:,0],Y[:,1], c = labels, cmap = "Set3", label = "Data Points", s=1)
+	legend1 = ax.legend(*scatter.legend_elements(), loc="lower right", title="Classes")
 	ax.add_artist(legend1)
 
 
