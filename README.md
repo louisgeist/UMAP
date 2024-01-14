@@ -3,6 +3,8 @@
 
 Our report is available report [here](https://github.com).
 
+![]
+
 ## Reproduce the results
 All the python code available in the src folder.
 
