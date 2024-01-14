@@ -94,9 +94,8 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
 
     phi = phi_class()
     phi.train(n_epochs_phi = 100)
-    # print(phi.a)
-    # print(phi.b)
-    # phi.display_fit()
+
+    phi.display_fit()
     
     alpha = 1
     n = Y.shape[0]
@@ -107,9 +106,7 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
         for i in range(n):
 
             Y_i = Y[i]
-            #print("1 : ",Y.requires_grad)
             Y_i.requires_grad_()
-            #print("2 ; ", Y.requires_grad)
             Y_without_i = torch.cat((Y[:i],Y[i+1:]), dim= 0)
 
             tensor_bool = torch.rand(n-1,)< torch.cat((top_rep[i,:i],top_rep[i,i+1:]), dim = -1)
@@ -130,7 +127,6 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
             grad_neg = torch.autograd.grad(f.sum(), Y_i)[0]
 
             Y[i] += alpha * grad_neg.clamp(-4,4)
-            #print(Y.requires_grad)
 
 
         alpha = 1 - epoch/n_epochs
