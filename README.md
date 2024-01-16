@@ -1,13 +1,13 @@
 # UMAP
 ## Introduction
 
-The goal of the project was to understand the [paper introducing UMAP](https://arxiv.org/abs/1802.03426) written by McInnes *et al.* and to implement from scratch the algorithm. Our report synthesizes the theoretical foundations of the UMAP algorithm and its practical implementation. It is accessible for a Master's student in applied mathematics. This GitHub repository contains our reimplementation of the algorithm. A section below explains how to reproduce our results.
+The goal of the project was to understand the [paper introducing UMAP](https://arxiv.org/abs/1802.03426) written by McInnes *et al.* and to implement the algorithm from scratch. Our report synthesizes the theoretical foundations of the UMAP algorithm and its practical implementation. It is accessible for a Master's student in applied mathematics. This GitHub repository contains our reimplementation of the algorithm. A section below explains how to reproduce our results.
 
 ![Figure](https://github.com/louisgeist/UMAP/blob/main/figure/1e%5E4samples_400e_0.05mindist.png)
 The figure above displays the results of the UMAP algorithm applied to 10,000 samples from the MNIST dataset, with the following parameters: 100 nearest neighbors, 0.05 minimal distance, and 400 training epochs.
 
 ## Reproduce the results
-All the python code available in the src folder.
+All the python code is available in the src folder.
 
 The files dedicated to the reimplementation of UMAP are as follows:
 - knn.py
