@@ -20,12 +20,12 @@ def clustering_evaluation(Y,labels, plot = True):
 	# Plot
 	if plot :
 		fig, ax = plt.subplots(1, 2, figsize =(10, 4))
-		scatter_true = ax[0].scatter(Y[:,0],Y[:,1], c = labels, cmap = "Set3", label = "Data Points", s=15)
+		scatter_true = ax[0].scatter(Y[:,0],Y[:,1], c = labels, cmap = "Set3", label = "Data Points", s=1)
 		legend_true = ax[0].legend(*scatter_true.legend_elements(), loc="lower left", title="Classes")
 		ax[0].add_artist(legend_true)
 		ax[0].axis('off')
 
-		scatter_predicted = ax[1].scatter(Y[:,0],Y[:,1], c = pedicted_labels, cmap = "Set1", label = "Data Points", s=15)
+		scatter_predicted = ax[1].scatter(Y[:,0],Y[:,1], c = pedicted_labels, cmap = "Set1", label = "Data Points", s=1)
 		ax[1].axis('off')
 
 		plt.tight_layout()
