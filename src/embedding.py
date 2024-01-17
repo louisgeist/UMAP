@@ -95,7 +95,7 @@ def optimize_embedding(top_rep, Y, min_dist, n_epochs):
     phi = phi_class()
     phi.train(n_epochs_phi = 100)
 
-    phi.display_fit()
+    #phi.display_fit()
     
     alpha = 1
     n = Y.shape[0]
