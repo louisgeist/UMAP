@@ -7,7 +7,7 @@ The goal of the project was to understand the [paper introducing UMAP](https://a
 The figure above displays the results of the UMAP algorithm applied to 10,000 samples from the MNIST dataset, with the following parameters: 100 nearest neighbors, 0.05 minimal distance, and 400 training epochs.
 
 ## Reproduce the results
-All the python code is available in the src folder.
+All the python code is available in the [src folder](https://github.com/louisgeist/UMAP/tree/main/src).
 
 The files dedicated to the reimplementation of UMAP are as follows:
 - knn.py
